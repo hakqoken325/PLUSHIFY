@@ -32,15 +32,27 @@ export async function transformToPlush(base64Image: string, mimeType: string): P
       },
     });
 
-    for (const part of response.candidates?.[0]?.content?.parts || []) {
+    const candidate = response.candidates?.[0];
+    
+    if (!candidate) {
+      throw new Error("No response from AI. Possible safety block.");
+    }
+
+    if (candidate.finishReason === 'SAFETY') {
+      throw new Error("Content blocked by safety filters. Please try a different image.");
+    }
+
+    for (const part of candidate.content.parts || []) {
       if (part.inlineData) {
         return `data:image/png;base64,${part.inlineData.data}`;
       }
     }
 
     return null;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini API Error:", error);
+    // Throw simpler messages for the UI
+    if (error.message?.includes('API_KEY')) throw new Error("Invalid API Key. Check Vercel settings.");
     throw error;
   }
 }
