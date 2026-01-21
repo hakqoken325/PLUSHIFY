@@ -1,0 +1,7 @@
+{
+  "name": "PLUSHIFY",
+  "description": "Transform any character into a high-quality plush toy using AI.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
