@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import { Language, translations } from './types';
 import { transformToPlush } from './geminiService';
 
@@ -57,14 +57,14 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center pb-20 px-4 md:px-8">
+    <div className="min-h-screen flex flex-col items-center pb-20 px-4 md:px-8 bg-[#0f1115] text-white">
       {/* Header */}
       <header className="w-full max-w-7xl flex items-center justify-between py-6">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
             <span className="text-black text-xs font-black">🧸</span>
           </div>
-          <span className="text-xl font-black tracking-tighter text-white">PLUSHIFY</span>
+          <span className="text-xl font-black tracking-tighter">PLUSHIFY</span>
         </div>
         
         <div className="flex items-center gap-4">
@@ -74,9 +74,6 @@ const App: React.FC = () => {
             rel="noopener noreferrer"
             className="flex items-center gap-2 bg-[#1d2128] hover:bg-[#2d323b] transition-colors border border-gray-800 px-4 py-1.5 rounded-md text-sm font-semibold"
           >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
-            </svg>
             {t.community}
           </a>
           
@@ -146,9 +143,9 @@ const App: React.FC = () => {
 
             <button 
               onClick={handleTransform}
-              disabled={!uploadedImage || isTransforming}
+              disabled={isTransforming}
               className={`w-full py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2 transition-all active:scale-95 ${
-                !uploadedImage || isTransforming 
+                isTransforming 
                   ? 'bg-yellow-400/20 text-yellow-400/40 cursor-not-allowed' 
                   : 'bg-[#7d6b35] hover:bg-[#8e7b3f] text-black shadow-[0_0_20px_rgba(250,204,21,0.2)]'
               }`}
@@ -169,7 +166,9 @@ const App: React.FC = () => {
             </button>
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mt-2">
-                <p className="text-red-500 text-[11px] text-center font-bold uppercase tracking-wider">{error}</p>
+                <p className="text-red-500 text-[11px] text-center font-bold uppercase tracking-wider leading-relaxed">
+                  {error}
+                </p>
               </div>
             )}
           </div>
@@ -210,9 +209,12 @@ const App: React.FC = () => {
               )}
               {isTransforming && (
                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm z-10">
-                   <div className="relative">
-                      <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="absolute inset-0 flex items-center justify-center text-xs font-bold">🧵</span>
+                   <div className="flex flex-col items-center gap-4">
+                      <div className="relative">
+                        <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="absolute inset-0 flex items-center justify-center text-xl">🧵</span>
+                      </div>
+                      <p className="text-yellow-400 text-xs font-black animate-pulse uppercase tracking-widest">{t.transforming}</p>
                    </div>
                 </div>
               )}
@@ -222,8 +224,8 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      <footer className="mt-auto pt-10 text-gray-600 text-[10px] font-bold tracking-widest uppercase">
-        © 2024 Plushify • Powered by Gemini
+      <footer className="mt-auto pt-10 text-gray-600 text-[10px] font-bold tracking-widest uppercase text-center">
+        © 2024 Plushify • Powered by Gemini Flash
       </footer>
     </div>
   );
