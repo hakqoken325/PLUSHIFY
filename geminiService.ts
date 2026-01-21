@@ -2,20 +2,24 @@
 import { GoogleGenAI } from "@google/genai";
 
 export async function transformToPlush(base64Image: string, mimeType: string): Promise<string | null> {
+  // Defensive check for the API Key
+  const apiKey = process.env.API_KEY;
+  
+  if (!apiKey || apiKey === "undefined" || apiKey === "") {
+    throw new Error("API_KEY_MISSING: The API key is not found in the browser environment. Please make sure you have added 'API_KEY' to Vercel Environment Variables AND triggered a NEW DEPLOYMENT (Redeploy).");
+  }
+
   try {
-    // Initializing with the environment key
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    
-    // gemini-2.5-flash-image is the standard for image-to-image tasks in the free/flash tier
+    const ai = new GoogleGenAI({ apiKey });
     const modelName = 'gemini-2.5-flash-image';
     
     const prompt = `
-      Transform the character in this image into a cute, professional designer plush toy.
-      - Maintain the character's key features, hair, and clothing style.
-      - Give it a soft, high-quality minky fabric texture.
-      - Add realistic plush seams and stitching details.
-      - Style: High-end collectible toy, studio lighting, simple clean background.
-      - Output: Only the image of the plush toy.
+      Transform this character into a high-quality, professional designer plush toy (soft toy).
+      - Maintain character colors, hair style, and facial features.
+      - Use soft, premium fabric texture (minky or fleece).
+      - Set on a clean, minimal white or soft grey studio background.
+      - Ensure it looks like a real physical product photography.
+      Output ONLY the image of the plush toy.
     `;
 
     const response = await ai.models.generateContent({
@@ -36,11 +40,11 @@ export async function transformToPlush(base64Image: string, mimeType: string): P
     const candidate = response.candidates?.[0];
     
     if (!candidate) {
-      throw new Error("No response. Check your API limits.");
+      throw new Error("No response from Gemini. You might have reached the free tier limit.");
     }
 
     if (candidate.finishReason === 'SAFETY') {
-      throw new Error("Content blocked by safety filters. Try a different image.");
+      throw new Error("Content blocked by safety filters. Try a more neutral image.");
     }
 
     for (const part of candidate.content.parts || []) {
@@ -53,8 +57,8 @@ export async function transformToPlush(base64Image: string, mimeType: string): P
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     
-    if (error.message?.includes('403') || error.message?.includes('API key')) {
-      throw new Error("API Key issue. Make sure API_KEY is set in Vercel Environment Variables.");
+    if (error.message?.includes('403')) {
+      throw new Error("API Key is invalid or has no access to this model. Check your Google AI Studio project.");
     }
     
     throw error;
