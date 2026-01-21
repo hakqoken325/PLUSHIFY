@@ -40,7 +40,6 @@ const App: React.FC = () => {
     setResultImage(null);
 
     try {
-      // Extract base64 part
       const base64Data = uploadedImage.split(',')[1];
       const mimeType = uploadedImage.split(',')[0].split(':')[1].split(';')[0];
       
@@ -50,8 +49,8 @@ const App: React.FC = () => {
       } else {
         setError(t.errorTransform);
       }
-    } catch (err) {
-      setError(t.errorTransform);
+    } catch (err: any) {
+      setError(err.message || t.errorTransform);
     } finally {
       setIsTransforming(false);
     }
@@ -168,7 +167,11 @@ const App: React.FC = () => {
                 </>
               )}
             </button>
-            {error && <p className="text-red-500 text-xs text-center mt-2 font-medium">{error}</p>}
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mt-2">
+                <p className="text-red-500 text-[11px] text-center font-bold uppercase tracking-wider">{error}</p>
+              </div>
+            )}
           </div>
 
           {/* Step 2: Result */}
